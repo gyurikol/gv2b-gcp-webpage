@@ -1,0 +1,28 @@
+@-webkit-keyframes moving-gradient {
+    0% { background-position: left bottom; }
+    100% { background-position: right bottom; }
+}
+
+.bar {
+    width: 100%;
+    /*height: 5px;
+    margin-top: 3px;*/
+    
+    background: -webkit-linear-gradient(
+        left,
+        #00D2C9 30%,
+        #86EDE8 80%,
+        #00D2C9 100%
+    ) repeat;
+    
+    -webkit-background-size: 50% 100%;
+    -webkit-animation-name: moving-gradient;
+    -webkit-animation-duration: 3s;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+}
+
+.half { width: 100%; overflow-x: hidden; }
+.half.full { width: 100%; }
+.half .bar { width: 100%; }
+.half.full .bar { -webkit-animation-duration: 5s; }

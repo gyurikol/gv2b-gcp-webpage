@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Gavl | Voice to Bid | Deakin SIT374 - Group 17</title>
+
+    <!-- jquery library embed -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- uber menu -->
+    <link rel="stylesheet" id="ubermenu-css" href="https://www.gavl.com/wp-content/plugins/ubermenu/pro/assets/css/ubermenu.min.css?ver=3.1.0.1" type="text/css" media="all">
+
+    <!-- Set viewport to not zoom on orientation change and make the device width the website width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Latest compiled and minified JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- Original Stylesheet - SOON TO BE DEPRECATED -->
+    <link rel="stylesheet" href="css/style.css" />
+
+    <!-- gavl website styling - "https://www.gavl.com/wp-content/themes/gavl/style.min.css" -->
+    <link rel="stylesheet" href="css/style.min.css" />
+
+    <!-- sticky footer styles -->
+    <link rel="stylesheet" href="css/sticky-footer.css" />
+
+    <!-- moving gradient styles -->
+    <link rel="stylesheet" href="css/moving-gradient.css" />
+
+  </head>
+
+  <!-- gavl voice to bid header -->
+  <body class="home page-template page-template-templates page-template-home-page page-template-templateshome-page-php page page-id-14">
+
+    <!-- gavl voice to bid header -->
+    <section class="grey-bg"><!-- <section class="grey-bg logo-block"> -->
+      <div class="row no-margin">
+        <div class="text-center logo">
+          <img src="img/gavl-v2b.jpg" class="custom-logo">
+        </div>
+      </div>
+    </section>
+
+    <!-- voice to bid menu -->
+    <section class="red-bg"><!-- <section class="green-bg hidden-sm hidden-xs"> -->
+      <div id="statusmenu" class=""><!-- bar addition -->
+        <div class="text-center">
+          <div class="menu-custom-inner">
+            <nav id="menubar" class="ubermenu ubermenu-main">
+              <ul id="menulist" class="ubermenu-nav">
+
+                <li id="menu-home" class="ubermenu-item">
+                  <a class="ubermenu-target" href="" tabindex="0">
+                    <span class="ubermenu-target-title ubermenu-target-text">Auction</span>
+                  </a>
+                </li>
+
+                <li id="menu-calibrate" class="ubermenu-item">
+                  <a class="ubermenu-target" href="" tabindex="1">
+                    <span class="ubermenu-target-title ubermenu-target-text"><del>Calibrate Auctioneer</del></span>
+                  </a>
+                </li>
+
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- contain page -->
+    <div class="container" style="overflow:scroll;">
+
+      <section>
+        <div id="startstop" class="text-center row no-margin">
+          <button id="start" class="green-bg">Start</button>
+          <button id="stop" class="red-bg">Stop</button>
+        </div>
+
+          <h2>Output:</h2>
+          <div id="output">...</div>
+      </section>
+
+      <!-- load customized watson speech js sdk -->
+      <script src="watson-speech.js"></script>
+
+      <!-- window.fetch pollyfill for IE/Edge & Older Chrome/FireFox -->
+      <script src="bower_components/fetch/fetch.js"></script>
+
+      <!-- website interface funtionality -->
+      <script style="display: hidden;">
+        // Pre-declare stream variable
+        var stream;
+
+        // Preload token
+        var token;
+        fetch('/api/speech-to-text/token')
+        .then(function(response) {
+            return response.text();
+        }).then(function(_token) {
+            token = _token;
+        }).catch(function(error) {
+            console.log(error);
+        });
+
+        // periodically check for ausction voice to bid stream status ...
+        //    for the purpose to indicate for the user
+        setInterval(function(){
+          // check if variable exists
+          if (typeof stream != 'undefined')
+          {
+            // if stream is runninh
+            if(stream.readable == true)
+            {
+              // status bar "streaming" color
+              if (!$('#statusmenu').hasClass("bar")) {
+                $("#statusmenu").addClass("bar");
+              }
+              // show start button when stream properly started
+              /*if ($('#stop').hasClass("hidden")) {
+                $("#stop").removeClass("hidden");
+              }*/
+            } else {
+              // status bar "not streaming" color
+              if ($('#statusmenu').hasClass("bar")) {
+                $("#statusmenu").removeClass("bar");
+              }
+              // show start button when stream properly stopped
+              /*if ($('#start').hasClass("hidden")) {
+                $("#start").removeClass("hidden");
+              }*/
+            }
+          }
+        }, 500);  // repeat every 1/2 seconds
+
+        // start voice to text transcription
+        document.querySelector('#start').onclick = function () {
+          stream = WatsonSpeech.SpeechToText.recognizeMicrophone({
+              token: token,
+              word_confidence: true,
+              speaker_labels: true,
+              outputElement: '#output' // CSS selector or DOM Element
+          });
+
+          // hide start button
+          /*$("#start").addClass("hidden");*/
+
+          //stream.setEncoding('utf8'); // get text instead of Buffers for on data events
+
+          // send stream data to console
+          stream.on('data', function(data) {
+            console.log(data);
+          });
+
+          // send stream errors to console
+          stream.on('error', function(err) {
+              console.log(err);
+          });
+
+          // stop voice to text transcription
+          document.querySelector('#stop').onclick = stream.stop.bind(stream);
+        };
+      </script>
+
+    </div>
+
+    <!-- gavl voice to bid footer -->
+    <section class="grey-bg footer">
+      <div class="container white-text text-center">
+        <div class="text-center"><!-- <div class="links-footer text-center"> -->
+          <span>SIT374 Group 17 Deakin University</span>
+          <div class="menu-footer-menu-container ">
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </body>
+</html>
